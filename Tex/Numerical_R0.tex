@@ -1,0 +1,509 @@
+\documentclass[12pt,reqno]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsthm}	
+\usepackage{cases}
+\usepackage{enumerate}
+\usepackage{color}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{example}{Example}
+%\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}{Remark}
+
+
+% %frequently
+\newcommand{\D}{\mathrm{d}}
+\newcommand{\Real}{\mathbb{R}}
+\newcommand{\cXomplex}{\mathbb{C}}
+\newcommand{\Int}{\mathrm{Int}}
+\newcommand{\Range}{\mathcal{R}}
+\newcommand{\Ker}{\mathcal{N}}
+\newcommand{\oOmega}{\overline{\Omega}}
+
+
+% % % %mathcal
+\newcommand{\cA}{\mathcal{A}}
+\newcommand{\cB}{\mathcal{B}}
+\newcommand{\cC}{\mathcal{C}}
+\newcommand{\cD}{\mathcal{D}}
+\newcommand{\cF}{\mathcal{F}}
+\newcommand{\cG}{\mathcal{G}}
+\newcommand{\cL}{\mathcal{L}}
+\newcommand{\cQ}{\mathcal{Q}}
+\newcommand{\cK}{\mathcal{K}}
+\newcommand{\cE}{\mathcal{E}}
+\newcommand{\cX}{\mathcal{X}}
+\newcommand{\cY}{\mathcal{Y}}
+\newcommand{\cM}{\mathcal{M}}
+% % %math bb
+\newcommand{\bF}{\mathbb{F}}
+\newcommand{\bQ}{\mathbb{Q}}
+\newcommand{\bK}{\mathbb{K}}
+\newcommand{\bG}{\mathbb{G}}
+\newcommand{\bJ}{\mathbb{J}}
+\newcommand{\bL}{\mathbb{L}}
+\newcommand{\bX}{\mathbb{X}}
+\newcommand{\bY}{\mathbb{Y}}
+% % %math tilde
+\newcommand{\tX}{\tilde{X}}
+\newcommand{\tY}{\tilde{Y}}
+% % %special
+\newcommand{\htau}{\hat{\tau}}
+\newcommand{\RL}{\mathfrak{L}}
+\newcommand{\R}{\mathcal{R}_0}
+\newcommand{\subX}{\tilde{X}}
+
+\newcommand{\bmu}{\bm{u}}
+\newcommand{\bmv}{\bm{v}}
+\newcommand{\bmw}{\bm{w}}
+
+\newcommand{\blue}{\color{blue}}
+\begin{document}
+\title{A summary for the program of $\R$
+%\thanks{The work is partially supported by PRC grant NSFC}
+\date{\empty}
+\author{Lei Zhang}
+}\maketitle
+\begin{abstract}
+This note is to summary how to compute the basic reproduction ratios numerically.
+\end{abstract}
+\section{Introduction}
+How to calculate $\R$ numerically is a very important problem.
+For the autonomous models of ODEs, Van den Driessche and Watmough \cite{van2002reproduction} found that the principal eigenvalue of the next generation matrix admits $\R$. For time-periodic compartmental ODEs models, Wang and Zhao \cite{wang2008threshold} proposed a numerical method to compute $\R$ by solving the unique root of a critical equation(see \cite[Theorem 2.1]{wang2008threshold}). We call it Root method. An alternative method to deal with the problem goes to Posny and Wang \cite{posny2014computing}. They transformed the problem into a matrix eigenvalue problem. For the infinite-dimensional cases, motivated by \cite{van2002reproduction}, Wang and Zhao presented a numerical method to approximate the principal eigenvalue of the next generation operator for the autonomous models of reaction-diffusion equations. Combined with the Root method and the principal eigenvalue of positive operators, a numerical method was developed by Liang, Zhang and Zhao \cite{liang2017lyme}. This method can be applied to various kinds of periodic models, including ODEs, reaction-diffusion equations, nonlocal dispersal equations with or without time delay.  In \cite{yang2018remarks}, Yang and Zhang proposed a direct method to compute $\R$ by computing the spectral radius of the corresponding operator, which can be regarded as a generalized method in \cite{posny2014computing}. We also refer to \cite{diekmann1990definition,bacaer2006epidemic}.
+
+The following part of this note is to describe the algorithm to compute $\R$. In the next section, we show a generalized Power Method to compute the spectral radius of a positive operator. In section \ref{sec:autonomous}, we show a numerical method to calculate $\R$ by approximating to the spectral radius of the associated operator for autonomous cases. In section \ref{sec:periodic}, we show the Root method to compute $\R$. In section \ref{sec:example}, we give ten examples to show how to compute $\R$ in Matlab. In section \ref{sec:summary}, we present a short summary for these methods.
+\section{Compute the spectral radius}\label{sec:spectral}
+ Now we introduce a generalized Power Method to compute the spectral radius of a positive operator $L$ numerically.
+
+\begin{lemma}\label{lem:com:r(L):1}
+	Assume that $(E,E_+)$ is an ordered Banach space with $E_+$ being normal and $\Int (E_+) \neq \emptyset$. Let $L$ be a positive bounded linear operator. Then $r(L)= \lim_{n \rightarrow +\infty } \Vert L^n e \Vert_E^{\frac{1}{n}},~\forall e \in \Int (E_+)$.
+\end{lemma}
+\begin{lemma}\label{lem:com:r(L):2}
+	Assume that $(E,E_+)$ is an ordered Banach space with $E_+$ being normal and $\Int (E_+) \neq \emptyset$, which is equipped with the norm $\Vert \cdot \Vert_E$. Let $L$ be a positive bounded linear operator. Choose $v_0 \in \Int (E_+)$ and define
+	$
+	a_n=\Vert L v_{n-1} \Vert_E,~
+	v_n =\frac{ L v_{n-1}}{a_n}, ~
+	~\forall n\geq 1.
+	$
+	If $\lim\limits_{ n\rightarrow +\infty} a_n$ exists, then $r(L)=\lim\limits_{ n\rightarrow +\infty} a_n$.
+\end{lemma}
+
+\begin{remark}\label{rem:com:r(L)}
+	The algorithm to compute $r(L)$:
+	\begin{enumerate}
+		\item $v_0=1$.
+		\item $v_n = \frac{L v_{n-1}}{\Vert L v_{n-1} \Vert }$, $\forall n \geq 1$.
+		\item Let $a_n =\Vert L v_{n-1} \Vert $, $n\geq 1$
+		\begin{enumerate}
+			\item By Lemma \ref{lem:com:r(L):1}, $r(L)= \lim_{n \rightarrow +\infty } (\Pi_{k=1}^n a_k )^{\frac{1}{n}}$. This is because
+			\begin{equation}
+			{\|L^n v_0\|} = \Pi_{k=1}^n a_k .
+			\end{equation}
+			\item In particular, if $\lim\limits_{ n\rightarrow +\infty} a_n$ exists, then $r(L)=\lim\limits_{ n\rightarrow +\infty} a_n$.
+		\end{enumerate}
+	\end{enumerate}
+\end{remark}
+
+\begin{remark}
+	For a  non-negative matrix $L$, it is known that
+	\begin{enumerate}
+		\item If $L^{k_0}$ is positive for some $k_0>0$, then $a_n$ in Lemma \ref{lem:com:r(L):2} converges.
+		\item If $L$ is  irreducible, then there exists some $k_0$ such that $(L+I)^{k_0}$ is positive.
+	\end{enumerate}
+\end{remark}
+
+\section{Autonomous Cases}\label{sec:autonomous}
+
+Now, we present a numerical method to compute $\R$ for a autonomous model. We refer to \cite{van2002reproduction,wang2012basic}.
+
+Let $X$ be a Banach space with the positive cone $X_+$. Assume that
+\begin{enumerate}[(H1)]
+\item $F$ is a bounded positive operator on $X$.
+ \item  $-V$ is a resolvent positive operator on $X$ and $s(-V)<0$.
+\end{enumerate}
+
+
+Consider the equation
+\begin{equation}
+	\frac{\D u}{\D t} = (F-V)u
+\end{equation}
+
+
+So $\cL$, $\R$ can be defined by
+\begin{equation}
+\cL u = FV^{-1} u,~ \R= r(\cL).
+\end{equation}
+\begin{remark}
+	\begin{enumerate}
+	\item	It is easy to see that
+	$$
+	r(FV^{-1})=r(V^{-1}F).
+	$$
+	\item In Matlab, eigenvalues of an matrix can be computed directly. 
+	\item We can also compute the spectral radius of $r(\cL)$ by Remark \ref{rem:com:r(L)} with $L= \cL$.
+	 \item Operators V and F can be approximated by discretization.
+ 	\end{enumerate}
+\end{remark}
+
+
+\section{Periodic cases}\label{sec:periodic}
+Next, we introduce the Root method. This method is proposed in \cite{wang2008threshold} and developed in \cite{liang2017lyme}.
+
+\subsection{Periodic cases without time-delay}
+Let $X$ be a Banach space with the positive cone $X_+$, and
+$$
+\bX = \{ u \in C(\Real,X): u (t)= u(t+T)\}
+$$
+with the maximum norm and the positive cone
+$$
+\bX_+ = \{ u \in C(\Real,X_+): u (t)= u(t+T)\}
+$$
+Assume that
+\begin{enumerate}[(H1)]
+	\item $F(t)$ is positive on $X$ and $T$-periodic for all $t \in \Real$.
+	\item Let $\{ \Phi(t,s): t \geq s \} $ be the $T$-periodic evolution family of
+	\begin{equation}\label{equ:periodic:internal}
+	\frac{\D u(t)}{\D t} = - V(t) u(t),~ t\geq 0.
+	\end{equation}
+	on $X$.	$\Phi(t,s)$ is positive on $X$ for all $t \geq s$ and $\omega(\Phi)<0$.
+\end{enumerate}
+
+Consider the equation
+\begin{equation}\label{equ:periodic}
+\frac{\D u(t)}{\D t} = F(t) u(t) - V(t) u(t),~ t\geq 0.
+\end{equation}
+
+
+
+So $\cL$, $\R$ can be defined by
+\begin{equation}
+\cL u (t) =\int_0^{+\infty}\Phi(t,t-s) F(t-s) u(t-s) \D s,~u \in \bX,
+\end{equation}
+and
+$$\R= r(\cL).
+$$
+Let $\{ U(t,s;\mu): t\geq s \}$ be evolution family on $X$ of the following system
+\begin{equation}\label{equ:periodic:mu}
+\frac{\D u(t)}{\D t} = \frac{1}{\mu} F(t) u(t) - V(t) u(t),~ t\geq 0.
+\end{equation}
+\begin{proposition}\label{prop:th:solution}
+	Under some conditions, $\mu = \R$ is the unique solution of $r(U(T,0;\mu))=1$.
+\end{proposition}
+ We also compute the spectral radius of $r(U(T,0;\mu))$ by Remark \ref{rem:com:r(L)} with $L= U(T,0;\mu)$ and search the solution of the equation $r(U(T,0;\mu))=1$ by the bisection method.
+
+\begin{remark}\label{rem:com:r(U)}
+	The algorithm to compute $r(L)$:
+	\begin{enumerate}
+		\item $v_0=1$ is the initial data.
+		\item $v_n = \frac{L v_{n-1}}{\Vert L v_{n-1} \Vert }$, $\forall n \geq 1$. Here $L v_{n-1}=U(T,0;\mu) v_{n-1}$ can be numerically computed by standard numerical method of differential equations.
+		\item Let $a_n =\Vert L v_{n-1} \Vert $, $n\geq 1$. Usually, $U(T,0,\mu)$ is eventually positive. Thus, $\lim\limits_{ n\rightarrow +\infty} a_n$ exists, and $r(L)=\lim\limits_{ n\rightarrow +\infty} a_n$.
+	\end{enumerate}
+\end{remark}
+\subsection{Periodic cases with time-delay}
+ Let $X$ be a Banach space with the positive cone $X_+$, and
+ $$
+ \bX = \{ u \in C(\Real,X): u (t)= u(t+T)\}
+ ,~
+ \cX = C([-\tau,0],X)
+ $$
+ with the maximum norm and the positive cone
+ $$
+ \bX_+ = \{ u \in C(\Real,X_+): u (t)= u(t+T)\}
+ ,~
+ \cX_+ = C([-\tau,0],X_+).
+ $$
+ Assume that
+ \begin{enumerate}[(H1)]
+ 	\item $F(t)$ is positive from $\cX$ to $X$ and $T$-periodic for all $t \in \Real$.
+ 	\item Let $\{ \Phi(t,s): t \geq s \} $ be the $T$-periodic evolution family of
+ 	\begin{equation}\label{equ:periodic:internal:delay}
+ 	\frac{\D u(t)}{\D t} = - V(t) u(t),~ t\geq 0.
+ 	\end{equation}
+ 	on $X$.	$\Phi(t,s)$ is positive on $X$ for all $t \geq s$  and $\omega(\Phi)<0$.
+ \end{enumerate}
+ Consider the equation
+ \begin{equation}\label{equ:periodic:delay}
+ \frac{\D u(t)}{\D t} = F(t) u_t - V(t) u(t),~ t\geq 0.
+ \end{equation}
+
+
+ So $\cL$, $\R$ can be defined by
+ \begin{equation}
+ \cL u (t) = \int_{0}^{+\infty} \Phi(t,t-s) F(t-s) u_{t-s} \D s, u \in \bX,
+ \end{equation}
+ and
+ $$
+\R= r(\cL).
+ $$
+ Let $\{ U(t,s;\mu): t\geq s \}$ be evolution family on $\cX$ of the following system
+ \begin{equation}\label{equ:periodic:mu:delay}
+ \frac{\D u(t)}{\D t} = \frac{1}{\mu} F(t) u_t - V(t) u(t),~ t\geq 0.
+ \end{equation}
+ \begin{proposition}\label{prop:th:solution:delay}
+ 	Under some conditions, $\mu = \R$ is the unique solution of $r(U(T,0;\mu))=1$.
+ \end{proposition}
+ We also compute the spectral radius of $r(U(T,0;\mu))$ by Remark \ref{rem:com:r(L)} with $L= U(T,0;\mu)$ and search the unique solution of the equation $r(U(T,0;\mu))=1$ by the bisection method.
+
+
+\section{Example}\label{sec:example}
+Next, we give some examples for the above methods. For convenience, we omit the corresponding domain when we give the definition of the operator $V(t)$ and $F(t)$.
+\begin{example}[Autonomous, ODEs, 3D]
+	Let
+	$$
+	V:=
+	\left(
+	\begin{matrix}
+	1& 0& 0\\
+	0& 2& 0\\
+	0& 0& 3
+	\end{matrix}
+	\right),
+	F:=
+	\left(
+	\begin{matrix}
+	0& 0& 1\\
+	1& 0& 0\\
+	0& 1& 0
+	\end{matrix}
+	\right).
+	$$
+	 Then
+	 $$
+	 \cL=FV^{-1}=
+	 \left(
+	 \begin{matrix}
+	 0& 0& 1\\
+	 \frac{1}{3}& 0& 0\\
+	 0& \frac{1}{2}& 0
+	 \end{matrix}
+	 \right),~
+	 \R=r(\cL)= (\frac{1}{6})^{\frac{1}{3}}.
+	 $$
+\end{example}
+
+\begin{example}[Periodic, ODEs, 1D] Let $V(t):=m(t)$, $F(t):=f(t)$, where $T=12$ and
+	$$m(t)=0.2(1+0.2\cos(2\pi \frac{t}{T})), ~f(t)=0.35(1+0.2\cos(2\pi \frac{t}{T})).$$
+	In this case, $\R = \frac{\int_{0}^{T} f(t) \D t}{\int_{0}^{T} m(t) \D t}=1.75$.
+\end{example}
+
+\begin{example}[Periodic, ODEs, 2D] Let
+	$$V(t):=
+	\left(
+	\begin{matrix}
+	m_1 (t) & 0\\
+	0& m_2(t)
+	\end{matrix}
+	\right), ~
+	F(t):=
+	\left(
+	\begin{matrix}
+	0 & f_{12} (t)\\
+	f_{21} (t)& 0
+	\end{matrix}
+	\right),
+	$$ where $T=12$ and
+	$$
+\begin{aligned}
+m_1(t)= 0.2(1+0.8\cos(2\pi \frac{t}{T})),~
+m_2(t)= 0.3(1+0.8\cos(2\pi \frac{t}{T})),\\
+f_{12}(t)=0.35(1+0.8\cos(2\pi \frac{t}{T})),~
+f_{21}(t)=0.5(1+0.8\sin(2\pi \frac{t}{T})).
+\end{aligned}
+$$
+\end{example}
+
+\begin{example}[Periodic, DDEs, 2D] Let
+	$$V(t) u(t):=
+	\left(
+	\begin{matrix}
+	m_1 (t) u_1(t) \\
+	m_2(t) u_2(t)
+	\end{matrix}
+	\right),
+	F(t) u_t:=
+	\left(
+	\begin{matrix}
+	f_{12} (t) u_2(t-\tau_2)\\
+	f_{21} (t) u_1(t-\tau_1)
+	\end{matrix}
+	\right),
+	$$ where $T=12$, $\tau_1=3$, $\tau_2=2$ and
+	$$
+\begin{aligned}
+m_1(t)= 0.2(1+0.8\cos(2\pi \frac{t}{T})),~
+m_2(t)= 0.3(1+0.8\cos(2\pi \frac{t}{T})),\\
+f_{12}(t)=0.35(1+0.8\cos(2\pi \frac{t}{T})),~
+f_{21}(t)=0.5(1+0.8\sin(2\pi \frac{t}{T})).
+\end{aligned}
+$$
+\end{example}
+
+
+\begin{example}[Periodic, DDEs with periodic delay, 2D] Let
+	$$V(t) u(t):=
+	\left(
+	\begin{matrix}
+	m_1 (t) u_1(t) \\
+	m_2(t) u_2(t)
+	\end{matrix}
+	\right),
+	F(t) u_t:=
+	\left(
+	\begin{matrix}
+	f_{12} (t) u_2(t-\tau_2(t))\\
+	f_{21} (t) u_1(t-\tau_1(t))
+	\end{matrix}
+	\right),
+	$$ where $T=12$, $\tau_1=1.8\cos(2\pi \frac{t}{T})+2$, $\tau_2=1.8\sin(2\pi \frac{t}{T})+2$ and
+	$$
+	\begin{aligned}
+	m_1(t)= 0.2(1+0.8\cos(2\pi \frac{t}{T})),~
+	m_2(t)= 0.3(1+0.8\cos(2\pi \frac{t}{T})),\\
+	f_{12}(t)=0.35(1+0.8\cos(2\pi \frac{t}{T})),~
+	f_{21}(t)=0.5(1+0.8\sin(2\pi \frac{t}{T})).
+	\end{aligned}
+	$$
+\end{example}
+
+\begin{example}[Autonomous, PDEs, scalar equation] Let $\oOmega=[0,1]$,
+	$$[F u](x) := f(x) u(x),~ [V u](x) := -[ d \Delta u(x) - m(x) u(x)]$$ with Neumann boundary condition, $$m(x)=1+0.5\cos(\frac{\pi}{2} x),~ f(x)=1 +0.5 \sin(\frac{\pi}{2} x)$$ and $d=0.01$.
+	Then
+	$$
+	\cL=FV^{-1},~
+	\R=r(\cL).
+	$$
+\end{example}
+
+
+\begin{example}[Autonomous, PDEs, two equations] Let $\oOmega=[0,1]$,
+	$$
+	[F u](x) :=
+	\left(
+	\begin{matrix}
+	f_{12} (x) u_2(x) \\
+	f_{21} (x) u_1(x)
+	\end{matrix}
+	\right),
+	[V u](x) :=-
+	\left(
+	\begin{matrix}
+	d_1 \Delta u_1(x) - m_1(x) u_1(x) \\
+	d_2 \Delta u_2(x) - m_2(x) u_2(x)
+	\end{matrix}
+	\right)$$ with Neumann boundary condition and
+	$$f_{12}(x)=1+0.5\cos(\frac{\pi}{2} x),~ f_{21}(x)= 1+ 0.5\sin(\frac{\pi}{2} x),$$ $$m_1(x)=1+0.5\cos(\frac{\pi}{2} x),~ m_2(x)=1+0.5\sin(\frac{\pi}{2} x),$$ and $d_1=0.01$, $d_2=0.02$.
+	Then
+	$$
+	\cL=FV^{-1},~
+	\R=r(\cL).
+	$$
+	In this case, $\R=1$.
+\end{example}
+
+
+\begin{example}[Periodic, PDEs, scalar equation] Let $\oOmega=[0,1]$,
+	$$[F(t) u](x) := f(x,t) u(x),$$
+	$$[V(t) u](x) :=- [d \Delta u(x) - m(x,t) u(x)],$$ with Neumann boundary condition, $$m(x,t)=(1+0.5\cos(\frac{\pi}{2} x))(1+0.5\cos(2\pi \frac{t}{T})),$$
+	$$f(x,t)=(1 +0.5 \sin(\frac{\pi}{2} x))(1+0.5\cos(2\pi \frac{t}{T})),$$  $d=0.01$ and $T=12$.
+\end{example}
+
+
+\begin{example}[Periodic, PDEs, two equations] Let $\oOmega=[0,1]$,
+	$$[F(t) u](x) := 	\left(
+	\begin{matrix}
+	f_{12} (x,t) u_2(x) \\
+	f_{21} (x,t) u_1(x)
+	\end{matrix}
+	\right),$$
+	$$[V(t) u](x) :=	
+	-\left(
+	\begin{matrix}
+	d_1 \Delta u_1(x) - m_1(x,t) u_1(x) \\
+	d_2 \Delta u_2(x) - m_2(x,t) u_2(x)
+	\end{matrix}
+	\right)$$ with Neumann boundary condition,
+	$$m_1(x,t)=(1+0.5\cos(\frac{\pi}{2} x))(1+0.5\cos(2\pi \frac{t}{T})),$$
+	$$m_2(x,t)=(1+0.5\sin(\frac{\pi}{2} x))(1+0.5\cos(2\pi \frac{t}{T})),$$
+	$$f_{12}(x,t)=(1 +0.5 \cos(\frac{\pi}{2} x))(1+0.5\sin(2\pi \frac{t}{T})),$$
+	$$f_{21}(x,t)=(1 +0.5 \sin(\frac{\pi}{2} x))(1+0.5\sin(2\pi \frac{t}{T})),$$
+	$d_1=0.01$, $d_2=0.02$ and $T=12$.
+\end{example}
+
+\begin{example}[Periodic, PDEs with time delay, two equations] Let $\oOmega=[0,1]$,
+	$$[F(t) \phi](x) := 	\left(
+	\begin{matrix}
+	f_{12} (x,t) \phi_2(-\tau)(x) \\
+	f_{21} (x,t) \phi_1(0)(x)
+	\end{matrix}
+	\right),$$
+	$$[V(t) u](x) :=-	
+	\left(
+	\begin{matrix}
+	d_1 \Delta u_1(x) - m_1(x,t) u_1(x) \\
+	d_2 \Delta u_2(x) - m_2(x,t) u_2(x)
+	\end{matrix}
+	\right)$$ with Neumann boundary condition,
+	$$m_1(x,t)=(1+0.5\cos(\frac{\pi}{2} x))(1+0.5\cos(2\pi \frac{t}{T})),$$
+	$$m_2(x,t)=(1+0.5\sin(\frac{\pi}{2} x))(1+0.5\cos(2\pi \frac{t}{T})),$$
+	$$f_{12}(x,t)=(1 +0.5 \cos(\frac{\pi}{2} x))(1+0.5\sin(2\pi \frac{t}{T})),$$
+	$$f_{21}(x,t)=(1 +0.5 \sin(\frac{\pi}{2} x))(1+0.5\sin(2\pi \frac{t}{T})),$$
+	$d_1=0.01$, $d_2=0.02$, $T=12$ and $\tau=0.6$.
+\end{example}
+
+\section{Summary}\label{sec:summary}
+
+For an autonomous model, $\R$ can be calculated numerically by computing the spectral radius of the corresponding operator. For a time-periodic model, $\R$ can be calculated by transfering to solve another problem, which is called Root method. In \cite{yang2018remarks}, we proposed a direct method to compute $\R$ by computing the spectral radius of the corresponding operator, which can be regarded as a generalized method in \cite{posny2014computing}. But it costs too much memory and it is difficult to run on a personal computer for a complex model. So we don't introduce it in this note.
+%\bibliographystyle{/home/dylan/Documents/Project/bb/siamplain}
+%\bibliography{/home/dylan/Documents/Project/bb/dd.bib}
+
+\begin{thebibliography}{1}
+	
+	\bibitem{bacaer2006epidemic}
+	{\sc N.~Baca{\"e}r and S.~Guernaoui}, {\em The epidemic threshold of
+		vector-borne diseases with seasonality}, J. Math. Biol., 53 (2006),
+	pp.~421--436.
+	
+	\bibitem{diekmann1990definition}
+	{\sc O.~Diekmann, J.~Heesterbeek, and J.~A. Metz}, {\em On the definition and
+		the computation of the basic reproduction ratio {$R_0$} in models for
+		infectious diseases in heterogeneous populations}, J. Math. Biol., 28 (1990),
+	pp.~365--382.
+	
+	\bibitem{liang2017lyme}
+	{\sc X.~Liang, L.~Zhang, and X.-Q. Zhao}, {\em Basic reproduction ratios for
+		periodic abstract functional differential equations (with application to a
+		spatial model for lyme disease)}, J. Dynam. Differential Equations, DOI
+	:10.1007/s10884-017-9601-7.
+	
+	\bibitem{posny2014computing}
+	{\sc D.~Posny and J.~Wang}, {\em Computing the basic reproductive numbers for
+		epidemiological models in nonhomogeneous environments}, Applied Mathematics
+	and Computation, 242 (2014), pp.~473--490.
+	
+	\bibitem{van2002reproduction}
+	{\sc P.~van~den Driessche and J.~Watmough}, {\em Reproduction numbers and
+		sub-threshold endemic equilibria for compartmental models of disease
+		transmission}, Math. Biosci., 180 (2002), pp.~29--48.
+	
+	\bibitem{wang2008threshold}
+	{\sc W.~Wang and X.-Q. Zhao}, {\em Threshold dynamics for compartmental
+		epidemic models in periodic environments}, J. Dynam. Differential Equations,
+	20 (2008), pp.~699--717.
+	
+	\bibitem{wang2012basic}
+	{\sc W.~Wang and X.-Q. Zhao}, {\em Basic reproduction numbers for
+		reaction-diffusion epidemic models}, SIAM J. Appl. Dyn. Syst., 11 (2012),
+	pp.~1652--1673.
+	
+	\bibitem{yang2018remarks}
+	{\sc T.~Yang and L.~Zhang}, {\em Remarks on basic reproduction ratios},
+	Submitted,  (2018).
+	
+\end{thebibliography}
+\end{document}
