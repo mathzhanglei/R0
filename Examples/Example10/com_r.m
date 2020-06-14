@@ -16,7 +16,7 @@ for j=1:Data.Time
         break
     end
     
-%    if index(j)>2 || index(j)<0.99
+%    if j==1 && index(1)<0.999   
 %        break
 %    end
         

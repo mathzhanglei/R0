@@ -10,7 +10,7 @@ h=1/(Xlen-1);  %%%%%% the length of one step of our space $X$, this will determa
 
 %%%%%%%The following is our parameters
 
-f12=1+0.6*cos(pi/2*x);
+f12=1+0.5*cos(pi/2*x);
 f21=1+0.5*sin(pi/2*x);
 m1=1+0.5*cos(pi/2*x);
 m2=1+0.5*sin(pi/2*x);
