@@ -11,6 +11,7 @@ A small technique:
 Add the following sentence into com_r
 
 if j==1 && index(1)<0.999
+
         break
 end
 
