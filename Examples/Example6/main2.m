@@ -15,10 +15,10 @@ m=1+0.5*cos(pi/2*x);
 
 d=0.01*ones(1,Xlen); %%%%%% ones() is to generate a matrix whose every element is 1.
 %%%%%%%%%%%  The following is to generate a matrix A
-D_1=diag(d(2:end),1);%%%%% To generate a matrix D_1, please see help
-D_2=diag(d(2:end),-1);
-D_3=diag([d(2:end),0]);
-D_4=diag([0,d(2:end)]);
+D_1=diag([2*d(1),d(2:Xlen-1)],1);%%%%% To generate a matrix D_1, please see help
+D_2=diag([d(2:Xlen-1),2*d(Xlen)],-1);
+D_3=diag(d);
+D_4=diag(d);
 Diff=(-D_3-D_4+D_1+D_2)*1/h^2;
 clear D_1 D_2 D_3 D_4  %%%%% If the matrix is useless, please clear it. If the data is large, this can accelerate our program(程序提速)
 
