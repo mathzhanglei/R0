@@ -23,6 +23,6 @@ for j=1:Time
     
 end
 
-R0=index(end)-1
+R0=index(end)
 
 max(real(eig(V\F)))
