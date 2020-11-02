@@ -5,14 +5,14 @@ clear
 
 
 Time=20;
-
+Xlen=80;
 PTlen=8000;
 
 
 tic
 
 
-C=linspace(0,0.95,50);
+C=linspace(0,0.95,100);
 
 
 RR0=zeros(length(C),1);
@@ -20,10 +20,15 @@ RR0=zeros(length(C),1);
 %parfor k=1:length(Para)
 for k=1:length(C)
     c=C(k);
-    Data=init(Time,PTlen,c);
+    Data=init(Time,PTlen,Xlen,c);
     
-    mu1=0.1;
-    mu2=10;
+    if k==1
+        mu1=0.1;
+        mu2=10;
+    else
+        mu1=RR0(k-1)/1.05;
+        mu2=RR0(k-1)*1.05;
+    end
     
     r1=com_r(mu1,Data);
     r2=com_r(mu2,Data);

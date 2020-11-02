@@ -22,8 +22,13 @@ for k=1:length(C)
     c=C(k);
     Data=init(Time,PTlen,c);
     
-    mu1=0.1;
-    mu2=10;
+    if k==1
+        mu1=0.1;
+        mu2=10;
+    else
+        mu1=RR0(k-1)/1.05;
+        mu2=RR0(k-1)*1.05;
+    end
     
     r1=com_r(mu1,Data);
     r2=com_r(mu2,Data);

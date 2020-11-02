@@ -3,7 +3,6 @@ clear
 
 
 
-
 Time=20;
 PTlen=8000;
 
@@ -12,8 +11,8 @@ tic
 C=1:60;
 C=C/30;
 RR0=zeros(1,length(C));
-for ii=1:length(C)
-    c=C(ii);
+for k=1:length(C)
+    c=C(k);
     Data=init(Time,PTlen,c);
     
     
@@ -54,8 +53,8 @@ for ii=1:length(C)
         
         [r mu1 mu2 mu];
     end
-    [mu,r,c,ii]
-    RR0(ii)=mu;
+    [mu,r,c,k]
+    RR0(k)=mu;
 save dataroot C RR0
 end
 programetime=toc
