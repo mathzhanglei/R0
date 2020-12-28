@@ -20,7 +20,7 @@ t=0:dt:PT-dt;
 
 C=linspace(0,0.95,100);
 RR0=zeros(length(C),1);
-for ii=100:length(C)
+for ii=1:length(C)
     c=C(ii);
     M1= 0.2*(1+c*cos(t/PT*2*pi));
     m1=1+c*cos(x/X*2*pi);
