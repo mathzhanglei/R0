@@ -23,7 +23,7 @@ Data.t=t;
 
 m=0.2*(1+0.2*cos((t+dt)/T*2*pi));
 
-f=0.35*(1+0.2*cos(t/T*2*pi));
+f=0.35*(1+0.2*sin(t/T*2*pi));
 
 Data.V=m;
 Data.F=f;
