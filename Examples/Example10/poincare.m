@@ -16,22 +16,22 @@ F=Data.F;
 
 taulen=Data.taulen;
 V=Data.V;
-v0=v(:,end);
 
+U=zeros(2*Xlen,taulen+Tlen);
+U(:,1:taulen)=v;
 for i=1:Tlen
     %%%Nonlinear parts
-    
+    j=i+taulen-1;
     Fi=F(:,:,i);
-    v1=[v(1:Xlen,end+1-taulen);v(Xlen+1:end,end)];
-    u0=v0+dt*Fi*v1/mu;
+    v1=[U(1:Xlen,j+1-taulen);U(Xlen+1:end,j)];
+    u0=U(:,j)+dt*Fi*v1/mu;
     
     %%%%Linear partss
 
     Vi=V(:,:,i);
     %%%% evol
     E=eye(2*Xlen)+Vi*dt;
-    v0=E\u0;
-    u(:,1:taulen-1)=v(:,2:taulen);
-    u(:,taulen)=v0;
-    v=u;
+    U(:,j+1)=E\u0;
+
 end
+v=U(:,end-taulen+1:end);

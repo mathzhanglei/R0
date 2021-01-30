@@ -8,7 +8,7 @@ dt=T/Tlen;
 t=0:dt:T-dt;
 Enum=1;
 m=0.2*(1+0.2*cos((t+dt)/T*2*pi));
-f=0.35*(1+0.2*sin(t/T*2*pi));
+f=0.35*(1+0.2*cos(t/T*2*pi));
 v0=ones(Enum,1);
 mu=1.7;
 

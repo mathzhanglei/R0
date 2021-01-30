@@ -16,25 +16,24 @@ tau2=Data.tau2;
 F=Data.F;
 V=Data.V;
 
-v0=v(:,end);
+U=zeros(Data.Enum,taulen+Tlen);
+U(:,1:taulen)=v;
 
 for i=1:Tlen
     %%%Nonlinear parts
-
+    j=i+taulen-1;
     taulen1= round(tau1/dt)+1;
     taulen2= round(tau2/dt)+1;
     Fi=F(:,:,i);
-    v1=[v(1,end - taulen1+1);v(2,end-taulen2+1)];
+    v1=[U(1,j - taulen1+1);U(2,j-taulen2+1)];
     
-    u0=v0+dt*Fi*v1/mu;
+    u0=U(:,j)+dt*Fi*v1/mu;
     
     %%%%Linear partss
     Vi=V(:,:,i);
     %%%% evol
     E=eye(Enum) + Vi*dt;
-    v0=E\u0;
+    U(:,j+1)=E\u0;
     
-    u(:,1:taulen-1)=v(:,2:taulen);
-    u(:,taulen)=v0;
-    v=u;
 end
+v=U(:,end-taulen+1:end);
