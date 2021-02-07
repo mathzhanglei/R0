@@ -6,7 +6,7 @@ dx=X/(Xlen-1);
 dt=T/Tlen;
 x=linspace(0,X,Xlen)';
 t=0:dt:T-dt;
-
+Enum=1;
 
 Data.Xlen=Xlen;
 Data.Time=Time;
@@ -17,6 +17,7 @@ Data.dx=dx;
 Data.dt=dt;
 Data.x=x;
 Data.t=t;
+Data.Enum=1;
 
 %%%%%%%%%%%%%%%%%parameters
 

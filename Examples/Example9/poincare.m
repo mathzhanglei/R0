@@ -27,7 +27,7 @@ for i=1:Tlen
 
     Vi=V(:,:,i);
     %%%% evol
-    E=eye(2*Xlen)+Vi*dt;
+    E=eye(Data.Enum*Xlen)+Vi*dt;
     v0=E\u0;
 end
 

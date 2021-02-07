@@ -34,7 +34,7 @@ Time=100;
 for j=1:Time
     %%%%%Evolution progress
     u=(V\F+eye(Xlen))*v;
-    index(j)=max(max(u));
+    index(j)=max(u);
     v=u/index(j);
     
     %%%% condition to break

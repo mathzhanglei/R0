@@ -6,7 +6,7 @@ dx=X/(Xlen-1);
 dt=T/Tlen;
 x=linspace(0,X,Xlen)';
 t=0:dt:T-dt;
-
+Enum=2;
 
 Data.Xlen=Xlen;
 Data.Time=Time;
@@ -17,7 +17,7 @@ Data.dx=dx;
 Data.dt=dt;
 Data.x=x;
 Data.t=t;
-
+Data.Enum=Enum;
 %%%%%%%%%%%%%%%%%parameters
 
 
@@ -53,8 +53,8 @@ D_4=diag(d);
 
 Diff=(-D_3-D_4+D_1+D_2)/(Data.dx)^2;
 clear D_1 D_2 D_3 D_4
-V=zeros(Xlen*2,Xlen*2,Tlen);
-F=zeros(Xlen*2,Xlen*2,Tlen);
+V=zeros(Xlen*Enum,Xlen*Enum,Tlen);
+F=zeros(Xlen*Enum,Xlen*Enum,Tlen);
 for i=1:Tlen
     V11=mt1(i)*diag(mx1)-Diff*D1;
     V22=mt2(i)*diag(mx2)-Diff*D2;

@@ -12,7 +12,7 @@ dt=Data.dt;
 x=Data.x;
 t=Data.t;
 F=Data.F;
-
+Enum=Data.Enum;
 
 V=Data.V;
 v0=v;
@@ -27,7 +27,7 @@ for i=1:Tlen
 
     Vi=V(:,:,i);
     %%%% evol
-    E=eye(Xlen)+Vi*dt;
+    E=eye(Xlen*Enum)+Vi*dt;
     v0=E\u0;
 end
 

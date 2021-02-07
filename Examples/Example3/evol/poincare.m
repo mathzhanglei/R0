@@ -21,5 +21,6 @@ for i=1:Tlen
     E=eye(Enum)+Vi*dt;
     v0=E\u0;
     
-    v=v0;
+    
 end
+v=v0;

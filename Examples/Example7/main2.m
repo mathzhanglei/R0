@@ -52,7 +52,7 @@ Time=100;
 for j=1:Time
     %%%%%Evolution progress
     u=(V\F+eye(Xlen*2))*v;
-    index(j)=max(max(u));
+    index(j)=max(u);
     v=u/index(j);
     
     %%%% condition to break
@@ -62,5 +62,5 @@ for j=1:Time
     
 end
 
-m=index(end)-1  %%%%%%% principal eigenvalue which is R_0
+R0=index(end)-1  %%%%%%% principal eigenvalue which is R_0
 toc

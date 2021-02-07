@@ -8,12 +8,12 @@ Time=1000;
 
 %%%%% initial data
 %v=ones(Len,1);
-v=[0;0;1];
+v=[1;1;1];
 %%%%Iteration
 for j=1:Time
     
     u=(V\F+eye(Len))*v;
-    index(j)=max(max(u));
+    index(j)=max(u);
     v=u/index(j);
     
     %%%% condition to break
@@ -26,3 +26,4 @@ end
 R0=index(end)-1
 
 max(real(eig(V\F)))
+(1/6)^(1/3)

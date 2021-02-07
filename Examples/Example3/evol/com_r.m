@@ -8,7 +8,7 @@ v=ones(Data.Enum,1);
 for j=1:Data.Time
     %%%%%Evolution progress
     v=poincare(mu,Data,v);
-    index(j)=max(max(v));
+    index(j)=max(v);
     v=v/index(j);
     
     %%%% condition to break
